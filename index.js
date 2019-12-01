@@ -1,13 +1,16 @@
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const app = express();
+const cors = require("cors");
+const Person = require("./models/person");
 
 app.use(bodyParser.json());
 app.use(express.static("build"));
-
-const cors = require("cors");
 app.use(cors());
+
+// Backend logging
 
 morgan.token("postRequest", function(req) {
 	if (req.method == "POST") {
@@ -20,29 +23,6 @@ app.use(
 		":method :url :status :res[content-length] - :response-time ms :postRequest"
 	)
 );
-
-let persons = [
-	{
-		name: "Samantha Smith",
-		number: "4842384238234",
-		id: 2
-	},
-	{
-		name: "Anna Smith",
-		number: "0287351214",
-		id: 3
-	},
-	{
-		name: "Berty Gin",
-		number: "9381237164",
-		id: 8
-	},
-	{
-		name: "Ada Lovelace",
-		number: "938262545",
-		id: 9
-	}
-];
 
 // GET requests
 
@@ -57,7 +37,9 @@ app.get("/info", (req, res) => {
 });
 
 app.get("/api/persons", (req, res) => {
-	res.json(persons);
+	Person.find({}).then(persons => {
+		res.json(persons.map(person => person.toJSON()));
+	});
 });
 
 app.get("/api/persons/:id", (req, res) => {
@@ -118,7 +100,7 @@ app.delete("/api/persons/:id", (req, res) => {
 	res.status(204).end();
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`);
 });
