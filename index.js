@@ -55,40 +55,27 @@ app.get("/api/persons/:id", (req, res) => {
 
 // POST requests
 
-const generateId = () => {
-	let min = 0;
-	let max = 999999;
-	return Math.floor(Math.random() * (max - min)) + min;
-};
-
 app.post("/api/persons", (req, res) => {
 	const body = req.body;
 
-	let duplicatePerson = persons.find(person => person.name === body.name);
-
-	if (!body.name) {
+	if (body.name === undefined) {
 		return res.status(400).json({
 			error: "Name missing"
 		});
-	} else if (!body.number) {
+	} else if (body.number === undefined) {
 		return res.status(400).json({
 			error: "Number missing"
 		});
-	} else if (duplicatePerson) {
-		return res.status(400).json({
-			error: "Name must be unique"
-		});
 	}
 
-	const person = {
+	const person = new Person({
 		name: body.name,
-		number: body.number,
-		id: generateId()
-	};
+		number: body.number
+	});
 
-	persons = persons.concat(person);
-
-	res.json(person);
+	person.save().then(savedPerson => {
+		res.json(savedPerson.toJSON());
+	});
 });
 
 // DELETE requests
