@@ -32,8 +32,13 @@ app.get("/", (req, res) => {
 
 app.get("/info", (req, res) => {
 	let date = new Date();
-	res.send(`<p>Phonebook has info for ${persons.length} people</p>
+
+	Person.find({})
+		.then(persons => {
+			res.send(`<p>Phonebook has info for ${persons.length} people</p>
 	<p>${date}</p>`);
+		})
+		.catch(error => next(error));
 });
 
 app.get("/api/persons", (req, res, next) => {
