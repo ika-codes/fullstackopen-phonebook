@@ -13,7 +13,7 @@ app.use(cors());
 // Backend logging
 
 morgan.token("postRequest", function(req) {
-	if (req.method == "POST") {
+	if (req.method === "POST") {
 		return JSON.stringify(req.body);
 	}
 });
@@ -30,7 +30,7 @@ app.get("/", (req, res) => {
 	res.send("<h1>Hello World!</h1>");
 });
 
-app.get("/info", (req, res) => {
+app.get("/info", (req, res, next) => {
 	let date = new Date();
 
 	Person.find({})
@@ -107,7 +107,7 @@ app.put("/api/persons/:id", (req, res, next) => {
 
 // DELETE requests
 
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res, next) => {
 	Person.findByIdAndRemove(req.params.id)
 		.then(result => {
 			res.status(204).end();
